@@ -1,0 +1,18 @@
+import random
+
+def get_numbers_ticket(min: int, max: int, quantity: int) -> list[int]:
+    # Перевірка обмежень
+    if not (1 <= min <= max <= 1000 and quantity <= (max - min + 1)):
+        return []
+
+    # Генерація унікальних випадкових чисел
+    random_numbers = random.sample(range(min, max + 1), quantity)
+
+    # Сортування чисел
+    random_numbers.sort()
+
+    return random_numbers
+
+# Виклик функції
+lottery_numbers = get_numbers_ticket(1, 49, 6)
+print("Ваші лотерейні числа:", lottery_numbers)
