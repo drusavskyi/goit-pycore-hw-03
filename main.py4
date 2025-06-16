@@ -1,0 +1,41 @@
+from datetime import datetime, date, timedelta
+
+# Константи
+NAME_KEY = "name"
+BIRTHDAY_KEY = "birthday"
+CONGRATS_DATE_KEY = "congratulation_date"
+DATE_PATTERN = "%Y.%m.%d"
+DAYS_RANGE = 7
+WEEKEND_DAYS = [6, 7]  # Saturday=6, Sunday=7
+
+def get_upcoming_birthdays(users: list, current_date: date = None):
+    if current_date is None:
+        current_date = datetime.today().date()
+    current_year = current_date.year
+
+    upcoming_birthdays_result = []
+
+    for user in users:
+        # Парсимо дату народження
+        birthday_date = datetime.strptime(user[BIRTHDAY_KEY], DATE_PATTERN).date()
+        birthday_this_year = date(current_year, birthday_date.month, birthday_date.day)
+
+        # Якщо день народження вже минув — розглядаємо наступний рік
+        if birthday_this_year < current_date:
+            birthday_this_year = birthday_this_year.replace(year=current_year + 1)
+
+        # Коригуємо дату привітання, якщо день народження на вихідних
+        day_of_week = birthday_this_year.isoweekday()  # Monday=1 ... Sunday=7
+        if day_of_week in WEEKEND_DAYS:
+            shift = 8 - day_of_week  # до наступного понеділка
+            birthday_this_year += timedelta(days=shift)
+
+        # Перевіряємо, чи потрапляє дата привітання у вікно 7 днів включно
+        days_until = (birthday_this_year - current_date).days
+        if 0 <= days_until <= DAYS_RANGE:
+            upcoming_birthdays_result.append({
+                NAME_KEY: user[NAME_KEY],
+                CONGRATS_DATE_KEY: birthday_this_year.strftime(DATE_PATTERN)
+            })
+
+    return upcoming_birthdays_result
